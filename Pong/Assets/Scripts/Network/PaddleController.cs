@@ -30,6 +30,7 @@ public class PaddleController : NetworkBehaviour
         All.Add(this);
         Place();
         Debug.Log($"[Server] Client {OwnerId}: {SideName(Side.Value)}, Object {ObjectId}");
+        GameState.Announce($"{SideName(Side.Value)} joined");
     }
 
     public override void OnStartClient()
@@ -46,6 +47,7 @@ public class PaddleController : NetworkBehaviour
     public override void OnStopServer()
     {
         All.Remove(this);
+        GameState.Announce($"{SideName(Side.Value)} left");
         if (Side.Value < 2 && NetworkBall.Instance != null) NetworkBall.Instance.ResetBall();
     }
 
@@ -90,6 +92,7 @@ public class PaddleController : NetworkBehaviour
             if (paddle.Side.Value < 2) players++;
         if (players != 2) return;
         ball.Serve(1 - Side.Value);
+        GameState.Announce($"{SideName(Side.Value)} served");
     }
 
     [ObserversRpc]
