@@ -198,11 +198,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 756c28cd3141c4140ae776188ee26729, type: 3}
   m_Name: 
   m_EditorClassIdentifier: FishNet.Runtime::FishNet.Managing.Statistic.StatisticsManager
-  _runInRelease: 0
+  _runInRelease: 1
   _networkTraffic:
-    _enableMode: 0
-    _updateClient: 0
-    _updateServer: 0
+    _enableMode: 2
+    _updateClient: 1
+    _updateServer: 1
 --- !u!114 &75791382
 MonoBehaviour:
   m_ObjectHideFlags: 0
