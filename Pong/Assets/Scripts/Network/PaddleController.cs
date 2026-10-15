@@ -46,6 +46,7 @@ public class PaddleController : NetworkBehaviour
     public override void OnStopServer()
     {
         All.Remove(this);
+        if (Side.Value < 2 && NetworkBall.Instance != null) NetworkBall.Instance.ResetBall();
     }
 
     public override void OnStopClient()
