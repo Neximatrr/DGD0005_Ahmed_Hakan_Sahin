@@ -27,3 +27,18 @@ Date: 15 October 2026. Partner: Berkay Şahin. Network: PongTest phone hotspot. 
 | Result | Both paddles moved on both screens. | Both paddles moved on both screens. |
 
 Each keyboard controlled only its own paddle. The host's player was blue LEFT and the guest was orange RIGHT. We swapped server roles and got the same result.
+
+## Design sheet
+
+| Thing | State or event? | FishNet piece | On which object? | Who writes / calls? |
+|---|---|---|---|---|
+| Ball position | State | NetworkTransform | Ball | Server |
+| Ball in play? | State | SyncVar | Ball | Server |
+| Two scores | State | SyncVar | GameState | Server |
+| Whose serve | State | SyncVar | GameState | Server |
+| Let me serve | Event | ServerRpc | Paddle | Owner |
+| LEFT scored! to all | Event | ObserversRpc | Scorer's paddle | Server |
+| YOU SERVE to one | Event | TargetRpc | Conceder's paddle | Server |
+| Event feed | State | SyncList | GameState | Server |
+
+BallSpawner on Court creates the ball in OnStartServer at (0, Court.BallY, 0) and spawns it on the network. NetworkBall.Update starts with `if (!IsServerInitialized) return;`, so only the server moves the ball.
