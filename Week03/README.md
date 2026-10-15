@@ -42,3 +42,9 @@ Each keyboard controlled only its own paddle. The host's player was blue LEFT an
 | Event feed | State | SyncList | GameState | Server |
 
 BallSpawner on Court creates the ball in OnStartServer at (0, Court.BallY, 0) and spawns it on the network. NetworkBall.Update starts with `if (!IsServerInitialized) return;`, so only the server moves the ball.
+
+## Step 8
+
+1. A hit sound for everyone uses ObserversRpc. A "not your serve" message for one player uses TargetRpc.
+2. LeftScore and RightScore are SyncVars on GameState. Only the server writes them.
+3. The server uses its received paddle copy. Network delay and interpolation make that position different from the owner's local position, so a hit on the player's screen can still be a miss on the server.

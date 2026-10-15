@@ -77,6 +77,31 @@ public class PaddleController : NetworkBehaviour
         if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) direction -= 1;
         transform.position += Vector3.forward * direction * speed * Time.deltaTime;
         Court.ClampPaddle(transform);
+        if (keyboard.spaceKey.wasPressedThisFrame) RequestServe();
+    }
+
+    [ServerRpc]
+    public void RequestServe()
+    {
+        NetworkBall ball = NetworkBall.Instance;
+        if (Side.Value == 2 || Side.Value != GameState.Instance.ServingSide.Value || ball == null || ball.InPlay.Value) return;
+        int players = 0;
+        foreach (PaddleController paddle in All)
+            if (paddle.Side.Value < 2) players++;
+        if (players != 2) return;
+        ball.Serve(1 - Side.Value);
+    }
+
+    [ObserversRpc]
+    public void AnnounceGoal(int left, int right)
+    {
+        ConnectionHud.Flash($"{SideName(Side.Value)} scored! {left} : {right}");
+    }
+
+    [TargetRpc]
+    public void YouServe(NetworkConnection target)
+    {
+        ConnectionHud.Flash("YOU SERVE");
     }
 
     public static string SideName(int side)

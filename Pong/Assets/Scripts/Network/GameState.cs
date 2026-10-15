@@ -38,6 +38,10 @@ public class GameState : NetworkBehaviour
         else RightScore.Value++;
         ServingSide.Value = 1 - scorerSide;
         NetworkBall.Instance.ResetBall();
+        foreach (PaddleController paddle in PaddleController.All)
+            if (paddle.Side.Value == scorerSide) paddle.AnnounceGoal(LeftScore.Value, RightScore.Value);
+        foreach (PaddleController paddle in PaddleController.All)
+            if (paddle.Side.Value == ServingSide.Value) paddle.YouServe(paddle.Owner);
     }
 
     private void OnDestroy()
