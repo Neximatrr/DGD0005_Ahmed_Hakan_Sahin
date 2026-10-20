@@ -12,6 +12,9 @@ public class PaddleController : NetworkBehaviour
     public readonly SyncVar<int> Side = new SyncVar<int>(2);
     [SerializeField] private float speed = 8f;
     private float _serverAxis;
+    private const double MinInputGap = 0.030;
+    private double _lastInputTime = -1;
+    public int RejectedInputs;
 
     private void Awake()
     {
@@ -29,6 +32,7 @@ public class PaddleController : NetworkBehaviour
         }
         Side.Value = !left ? 0 : !right ? 1 : 2;
         All.Add(this);
+        ConnectionHud.Panels.Add(InputPanel);
         Place();
         Debug.Log($"[Server] Client {OwnerId}: {SideName(Side.Value)}, Object {ObjectId}");
         GameState.Announce($"{SideName(Side.Value)} joined");
@@ -47,6 +51,7 @@ public class PaddleController : NetworkBehaviour
 
     public override void OnStopServer()
     {
+        ConnectionHud.Panels.Remove(InputPanel);
         All.Remove(this);
         GameState.Announce($"{SideName(Side.Value)} left");
         if (Side.Value < 2 && NetworkBall.Instance != null) NetworkBall.Instance.ResetBall();
@@ -114,6 +119,14 @@ public class PaddleController : NetworkBehaviour
         if (float.IsNaN(axis)) return;
         axis = Mathf.Clamp(axis, -1f, 1f);
         if (Side.Value == 2) return;
+        double now = TimeManager.TicksToTime(TimeManager.Tick);
+        if (_lastInputTime >= 0 && now - _lastInputTime < MinInputGap)
+        {
+            RejectedInputs++;
+            Debug.Log($"[Server] Rejected input from client {OwnerId}: too fast.");
+            return;
+        }
+        _lastInputTime = now;
         _serverAxis = axis;
     }
 
@@ -140,6 +153,11 @@ public class PaddleController : NetworkBehaviour
     public void YouServe(NetworkConnection target)
     {
         ConnectionHud.Flash("YOU SERVE");
+    }
+
+    private string InputPanel()
+    {
+        return $"Rejected inputs (paddle {OwnerId}): {RejectedInputs}";
     }
 
     public static string SideName(int side)
