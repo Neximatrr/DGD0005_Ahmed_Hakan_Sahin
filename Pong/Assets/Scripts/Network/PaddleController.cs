@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FishNet.Connection;
+using FishNet.Component.Transforming;
 using FishNet.Object;
 using FishNet.Object.Synchronizing;
 using UnityEngine;
@@ -91,6 +92,16 @@ public class PaddleController : NetworkBehaviour
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null) return;
         if (keyboard.spaceKey.wasPressedThisFrame) RequestServe();
+        if (keyboard.cKey.wasPressedThisFrame)
+        {
+            for (int i = 0; i < 20; i++) ServerSetAxis(1f);
+        }
+        if (keyboard.xKey.wasPressedThisFrame)
+        {
+            ServerSetAxis(50f);
+        }
+        if (keyboard.tKey.wasPressedThisFrame && NetworkBall.Instance != null)
+            transform.position = NetworkBall.Instance.transform.position;
     }
 
     private void OnTick()
@@ -110,6 +121,7 @@ public class PaddleController : NetworkBehaviour
         {
             transform.position += Vector3.forward * _serverAxis * speed * (float)TimeManager.TickDelta;
             Court.ClampPaddle(transform);
+            GetComponent<NetworkTransform>().ForceSend();
         }
     }
 

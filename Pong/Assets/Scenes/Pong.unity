@@ -314,7 +314,7 @@ MonoBehaviour:
   _remoteServerTimeout: 2
   _remoteServerTimeoutDuration: 60
   _changeFrameRate: 1
-  _frameRate: 500
+  _frameRate: 60
 --- !u!114 &75791388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,7 +338,7 @@ MonoBehaviour:
     Rotation: 2
     Scale: 2
   _changeFrameRate: 1
-  _frameRate: 500
+  _frameRate: 60
   _shareIds: 1
   _startOnHeadless: 0
 --- !u!114 &75791389

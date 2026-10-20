@@ -17,3 +17,5 @@ Move with W/S or the arrow keys. Press Space when it is your serve.
 For Multiplayer Play Mode, activate Players 2, 3 and 4 and tag Player 2 `Server`. Start clients in the main editor, Player 3 and Player 4, in that order.
 
 [Week 3 answers and tests](Week03/README.md)
+
+[Week 4 answers and tests](Week04/README.md)
