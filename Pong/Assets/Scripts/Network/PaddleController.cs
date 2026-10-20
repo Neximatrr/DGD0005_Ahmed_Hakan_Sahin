@@ -11,6 +11,7 @@ public class PaddleController : NetworkBehaviour
     public static PaddleController Local;
     public readonly SyncVar<int> Side = new SyncVar<int>(2);
     [SerializeField] private float speed = 8f;
+    private float _serverAxis;
 
     private void Awake()
     {
@@ -68,18 +69,49 @@ public class PaddleController : NetworkBehaviour
         Court.Paint(gameObject, Side.Value == 0 ? new Color(0.35f, 0.65f, 1f) : new Color(1f, 0.60f, 0.25f));
     }
 
+    public override void OnStartNetwork()
+    {
+        TimeManager.OnTick += OnTick;
+    }
+
+    public override void OnStopNetwork()
+    {
+        TimeManager.OnTick -= OnTick;
+    }
+
     private void Update()
     {
         if (!IsOwner) return;
         if (Side.Value == 2) return;
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null) return;
-        float direction = 0;
-        if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) direction += 1;
-        if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) direction -= 1;
-        transform.position += Vector3.forward * direction * speed * Time.deltaTime;
-        Court.ClampPaddle(transform);
         if (keyboard.spaceKey.wasPressedThisFrame) RequestServe();
+    }
+
+    private void OnTick()
+    {
+        if (IsOwner && Side.Value != 2)
+        {
+            float axis = 0;
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard != null)
+            {
+                if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) axis += 1;
+                if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) axis -= 1;
+            }
+            ServerSetAxis(axis);
+        }
+        if (IsServerInitialized)
+        {
+            transform.position += Vector3.forward * _serverAxis * speed * (float)TimeManager.TickDelta;
+            Court.ClampPaddle(transform);
+        }
+    }
+
+    [ServerRpc]
+    private void ServerSetAxis(float axis)
+    {
+        _serverAxis = axis;
     }
 
     [ServerRpc]
